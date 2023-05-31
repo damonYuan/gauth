@@ -1,11 +1,12 @@
 from setuptools import setup
-REQUIREMENTS = [i.strip() for i in open("requirements.txt").readlines()]
+with open("requirements.txt", "r") as f:
+    REQUIREMENTS = f.read().splitlines()
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
     name="gauth",
-    version="1.0.2",
+    version="1.0.6",
     license='MIT',
     description="Tool to help migrate Google Authenticator from phone to desktop",
     long_description=long_description,
@@ -13,7 +14,8 @@ setup(
     author="Damon Yuan",
     author_email="damon.yuan.dev@gmail.com",
     url="https://github.com/damonYuan/gauth",
-    packages=['gauth'],
+    packages=['gauth', 'gauth.extract', 'gauth.extract.protobuf_generated_python'],
+    include_package_data=True,
     entry_points="""
     [console_scripts]
     gauth = gauth.main:main
@@ -22,7 +24,6 @@ setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
     ],
     python_requires=">=3.6"
 )

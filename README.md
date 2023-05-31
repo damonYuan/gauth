@@ -48,3 +48,7 @@ python setup.py sdist
 twine upload dist/*
 ```
 
+# Reference
+
+[extract_otp_secrets v2.4.3](https://github.com/scito/extract_otp_secrets)
+
