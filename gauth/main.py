@@ -39,6 +39,7 @@ def silence_stdout():
 def main():
     parser = argparse.ArgumentParser(description='Tool to help migrate Google Authenticator from phone to desktop')
     parser.add_argument('-p', '--path', help='file path to the exported qr code or text file', required=True)
+    parser.add_argument('-n', '--name', help='otp name', required=False)
     args = parser.parse_args()
     if args.path:
         if check_img(args.path):
@@ -49,12 +50,15 @@ def main():
         with tempfile.NamedTemporaryFile() as tmp:
             params = [args.path, '--json', tmp.name, '--quiet', '--ignore']
             extract_otp_secrets.main(params)
-            otps(json.load(tmp))
+            otps(json.load(tmp), args.name)
 
 
-def otps(config):
+def otps(config, name):
     for e in config:
-        otp(e['name'], e['issuer'], e['secret'].strip())
+        if name is not None and name == e['name']:
+            otp(e['name'], e['issuer'], e['secret'].strip())
+        elif name is None:
+            otp(e['name'], e['issuer'], e['secret'].strip())
 
 
 def otp(totp_name, issuer, totp_secret):
