@@ -41,7 +41,7 @@ def main():
     logging.basicConfig()
     logging.getLogger().setLevel(logging.ERROR)
     parser = argparse.ArgumentParser(description='Tool to help migrate Google Authenticator from phone to desktop')
-    parser.add_argument('-p', '--path', help='file path to the export qr code or text file', required=True)
+    parser.add_argument('-p', '--path', help='file path to the exported qr code or text file', required=True)
     args = parser.parse_args()
     if args.path:
         if check_img(args.path):
