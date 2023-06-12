@@ -10,3 +10,4 @@ qreader<2.0.0
 typing_extensions; python_version<='3.7'
 argparse==1.4.0
 pyotp==2.8.0
+pyyaml==6.0

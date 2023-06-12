@@ -4,6 +4,7 @@ import argparse
 import pyotp
 import tempfile
 import json
+import yaml
 from PIL import Image
 from contextlib import contextmanager
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../'))
@@ -19,6 +20,13 @@ def check_img(filename):
         im.close()
         return True
     except:
+        return False
+
+
+def check_yaml(filename):
+    if filename.endswith('.yaml') or filename.endswith('.yml'):
+        return True
+    else:
         return False
 
 
@@ -38,19 +46,29 @@ def silence_stdout():
 
 def main():
     parser = argparse.ArgumentParser(description='Tool to help migrate Google Authenticator from phone to desktop')
-    parser.add_argument('-p', '--path', help='file path to the exported qr code or text file', required=True)
+    parser.add_argument('-p', '--path', help='file path to the exported qr code or text file, or yaml file', required=True)
     parser.add_argument('-n', '--name', help='otp name', required=False)
     args = parser.parse_args()
     if args.path:
         if check_img(args.path):
             from gauth.extract import extract_otp_secrets
+            with tempfile.NamedTemporaryFile() as tmp:
+                params = [args.path, '--json', tmp.name, '--quiet', '--ignore']
+                extract_otp_secrets.main(params)
+                otps(json.load(tmp), args.name)
+        elif check_yaml(args.path):
+            with open(args.path, "r") as yaml_file:
+                config = yaml.safe_load(yaml_file)
+                for e in config['keys']:
+                    totp = pyotp.TOTP(e['Secret'].strip())
+                    print(f"{e['Issuer'].ljust(15)} {e['Name'].ljust(38)}: {totp.now()}")
         else:
             with silence_stdout():
                 from gauth.extract import extract_otp_secrets
-        with tempfile.NamedTemporaryFile() as tmp:
-            params = [args.path, '--json', tmp.name, '--quiet', '--ignore']
-            extract_otp_secrets.main(params)
-            otps(json.load(tmp), args.name)
+            with tempfile.NamedTemporaryFile() as tmp:
+                params = [args.path, '--json', tmp.name, '--quiet', '--ignore']
+                extract_otp_secrets.main(params)
+                otps(json.load(tmp), args.name)
 
 
 def otps(config, name):

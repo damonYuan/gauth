@@ -47,6 +47,21 @@ pip install --upgrade twine
 python setup.py sdist
 twine upload dist/*
 ```
+# YAML example
+
+```
+---
+keys:
+  - Name:    TEST1
+    Secret:  1234567
+    Issuer:  ABC
+    Type:    totp
+
+  - Name:    TEST2
+    Secret:  1234455
+    Issuer:  CDE
+    Type:    totp
+```
 
 # Reference
 
