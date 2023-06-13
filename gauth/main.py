@@ -50,21 +50,18 @@ def main():
     parser.add_argument('-n', '--name', help='otp name', required=False)
     args = parser.parse_args()
     if args.path:
-        if check_img(args.path):
-            from gauth.extract import extract_otp_secrets
-            with tempfile.NamedTemporaryFile() as tmp:
-                params = [args.path, '--json', tmp.name, '--quiet', '--ignore']
-                extract_otp_secrets.main(params)
-                otps(json.load(tmp), args.name)
-        elif check_yaml(args.path):
+        if check_yaml(args.path):
             with open(args.path, "r") as yaml_file:
                 config = yaml.safe_load(yaml_file)
                 for e in config['keys']:
                     totp = pyotp.TOTP(e['Secret'].strip())
                     print(f"{e['Issuer'].ljust(15)} {e['Name'].ljust(38)}: {totp.now()}")
         else:
-            with silence_stdout():
+            if check_img(args.path):
                 from gauth.extract import extract_otp_secrets
+            else:
+                with silence_stdout():
+                    from gauth.extract import extract_otp_secrets
             with tempfile.NamedTemporaryFile() as tmp:
                 params = [args.path, '--json', tmp.name, '--quiet', '--ignore']
                 extract_otp_secrets.main(params)
